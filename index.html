@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Padel Doubles Match Scheduler</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #334155;
+      --border: #475569;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #22c55e;
+      --primary-hover: #16a34a;
+      --accent: #38bdf8;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding: 24px 0;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #22c55e, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 24px;
+    }
+
+    @media (min-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card h2 span { font-size: 1.3rem; }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      transition: border-color 0.15s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .form-row, .form-row-3 { grid-template-columns: 1fr; }
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 10px 18px;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #052e16;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border); }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid var(--danger);
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+    .btn-danger:hover { background: var(--danger); color: white; }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #0c4a6e;
+    }
+    .btn-accent:hover { background: #0ea5e9; }
+
+    .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+
+    .player-list {
+      max-height: 320px;
+      overflow-y: auto;
+      margin-top: 8px;
+    }
+
+    .player-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid transparent;
+      gap: 12px;
+    }
+
+    .player-item:hover { border-color: var(--border); }
+
+    .player-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .player-name {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-level { background: #166534; color: #bbf7d0; }
+    .badge-m { background: #1e3a5f; color: #93c5fd; }
+    .badge-f { background: #4a1942; color: #f9a8d4; }
+    .badge-o { background: #3f3f46; color: #d4d4d8; }
+
+    .actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .schedule-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .slot {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .slot-time {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .courts {
+      display: grid;
+      gap: 12px;
+    }
+
+    @media (min-width: 700px) {
+      .courts { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    }
+
+    .court-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .court-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .match-players {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .team {
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .team-player {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .team-level {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .vs {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 0.85rem;
+    }
+
+    .match-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .idle-players {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--muted);
+      transition: all 0.15s;
+    }
+
+    .tab.active {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .tab:hover:not(.active) { color: var(--text); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .custom-match-form {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .selected-players {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 12px;
+      min-height: 32px;
+    }
+
+    .chip {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip button {
+      background: none;
+      border: none;
+      color: var(--muted);
+      padding: 0;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .chip button:hover { color: var(--danger); }
+
+    .custom-list .player-item { cursor: default; }
+
+    .stats-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: var(--bg);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .stat { color: var(--muted); }
+    .stat strong { color: var(--text); }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      z-index: 100;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .gender-options {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .gender-options label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .gender-options input { width: auto; margin: 0; }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: -8px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎾 Padel Doubles Scheduler</h1>
+      <p>Organize fair matches by level, gender, availability & courts</p>
+    </header>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="players">Players</div>
+      <div class="tab" data-tab="settings">Settings</div>
+      <div class="tab" data-tab="custom">Custom Matches</div>
+      <div class="tab" data-tab="schedule">Schedule</div>
+    </div>
+
+    <!-- PLAYERS PANEL -->
+    <div id="panel-players" class="panel active">
+      <div class="grid grid-2">
+        <div class="card">
+          <h2><span>➕</span> Add Player</h2>
+          <form id="player-form">
+            <label for="p-name">Name</label>
+            <input type="text" id="p-name" placeholder="e.g. Alex Rivera" required>
+
+            <div class="form-row">
+              <div>
+                <label for="p-level">Level (1.0 – 7.0)</label>
+                <input type="number" id="p-level" min="1" max="7" step="0.5" value="3.0" required>
+              </div>
+              <div>
+                <label for="p-gender">Gender</label>
+                <select id="p-gender">
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+                  <option value="O">Other / Prefer not</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div>
+                <label for="p-start">Available From</label>
+                <input type="time" id="p-start" value="09:00" required>
+              </div>
+              <div>
+                <label for="p-end">Available Until</label>
+                <input type="time" id="p-end" value="13:00" required>
+              </div>
+            </div>
+            <p class="hint">Player will only be scheduled inside this window.</p>
+
+            <button type="submit" class="btn-primary" style="width:100%">Add Player</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2><span>👥</span> Players <span id="player-count" style="font-size:0.9rem;color:var(--muted);font-weight:400"></span></h2>
+          <div class="player-list" id="player-list">
+            <div class="empty-state">No players yet. Add some to get started.</div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-secondary btn-sm" id="btn-load-sample">Load Sample Players</button>
+            <button class="btn-secondary btn-sm" id="btn-clear-players">Clear All</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PANEL -->
+    <div id="panel-settings" class="panel">
+      <div class="card">
+        <h2><span>⚙️</span> Match & Court Settings</h2>
+        <div class="settings-grid">
+          <div>
+            <label for="num-courts">Number of Courts</label>
+            <input type="number" id="num-courts" min="1" max="12" value="2">
+          </div>
+          <div>
+            <label for="match-duration">Match Duration (min)</label>
+            <input type="number" id="match-duration" min="20" max="120" step="5" value="60">
+          </div>
+          <div>
+            <label for="session-start">Session Start</label>
+            <input type="time" id="session-start" value="09:00">
+          </div>
+          <div>
+            <label for="session-end">Session End</label>
+            <input type="time" id="session-end" value="13:00">
+          </div>
+          <div>
+            <label for="changeover">Changeover (min)</label>
+            <input type="number" id="changeover" min="0" max="30" value="10">
+          </div>
+          <div>
+            <label for="max-matches">Max Matches / Player</label>
+            <input type="number" id="max-matches" min="1" max="10" value="3">
+          </div>
+        </div>
+
+        <h2 style="margin-top:24px"><span>🚻</span> Gender Preference</h2>
+        <div class="gender-options">
+          <label><input type="radio" name="gender-pref" value="any" checked> Any (mixed OK)</label>
+          <label><input type="radio" name="gender-pref" value="same"> Prefer same gender</label>
+          <label><input type="radio" name="gender-pref" value="mixed"> Prefer mixed</label>
+        </div>
+        <p class="hint">Affects automatic matchmaking. Custom matches ignore this.</p>
+
+        <h2 style="margin-top:20px"><span>⚖️</span> Level Matching</h2>
+        <div>
+          <label for="level-tolerance">Max Level Difference in a Match</label>
+          <input type="number" id="level-tolerance" min="0.5" max="3" step="0.5" value="1.5">
+        </div>
+        <p class="hint">Players whose levels differ more than this will not be auto-matched together when possible.</p>
+      </div>
+    </div>
+
+    <!-- CUSTOM MATCHES PANEL -->
+    <div id="panel-custom" class="panel">
+      <div class="card">
+        <h2><span>✏️</span> Create Custom Match</h2>
+        <p class="hint" style="margin-bottom:12px">Select exactly 4 players. They will be prioritized when generating the schedule.</p>
+        
+        <div class="custom-match-form">
+          <label>Select 4 players</label>
+          <select id="custom-player-select">
+            <option value="">— Choose player —</option>
+          </select>
+          <div class="selected-players" id="custom-selected"></div>
+          <div class="form-row">
+            <div>
+              <label for="custom-preferred-time">Preferred Start Time (optional)</label>
+              <input type="time" id="custom-preferred-time">
+            </div>
+            <div style="display:flex;align-items:flex-end">
+              <button class="btn-primary" id="btn-add-custom" style="width:100%" disabled>Add Custom Match</button>
+            </div>
+          </div>
+        </div>
+
+        <h2><span>📋</span> Custom Matches Queue</h2>
+        <div id="custom-list" class="custom-list">
+          <div class="empty-state">No custom matches defined.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE PANEL -->
+    <div id="panel-schedule" class="panel">
+      <div class="card">
+        <div class="schedule-header">
+          <h2 style="margin:0"><span>📅</span> Generated Schedule</h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-primary" id="btn-generate">Generate Schedule</button>
+            <button class="btn-secondary" id="btn-export">Export Text</button>
+            <button class="btn-secondary" id="btn-print">Print</button>
+          </div>
+        </div>
+
+        <div class="stats-bar" id="stats-bar" style="display:none">
+          <div class="stat">Matches: <strong id="stat-matches">0</strong></div>
+          <div class="stat">Players used: <strong id="stat-players">0</strong></div>
+          <div class="stat">Time slots: <strong id="stat-slots">0</strong></div>
+          <div class="stat">Avg level spread: <strong id="stat-spread">—</strong></div>
+        </div>
+
+        <div id="schedule-output">
+          <div class="empty-state">
+            Configure players & settings, then click <strong>Generate Schedule</strong>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Padel Doubles Match Scheduler · Client-side only · Data saved in your browser
+    </footer>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ========== STATE ==========
+    let players = JSON.parse(localStorage.getItem('padel_players') || '[]');
+    let customMatches = JSON.parse(localStorage.getItem('padel_custom') || '[]');
+    let lastSchedule = null;
+    let customSelectedIds = [];
+
+    // ========== HELPERS ==========
+    function save() {
+      localStorage.setItem('padel_players', JSON.stringify(players));
+      localStorage.setItem('padel_custom', JSON.stringify(customMatches));
+    }
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    function timeToMinutes(t) {
+      if (!t) return 0;
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function minutesToTime(mins) {
+      const h = Math.floor(mins / 60) % 24;
+      const m = mins % 60;
+      return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+    }
+
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    }
+
+    function genderBadge(g) {
+      if (g === 'M') return '<span class="badge badge-m">M</span>';
+      if (g === 'F') return '<span class="badge badge-f">F</span>';
+      return '<span class="badge badge-o">O</span>';
+    }
+
+    // ========== TABS ==========
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+        if (tab.dataset.tab === 'custom') refreshCustomSelect();
+      });
+    });
+
+    // ========== PLAYERS ==========
+    function renderPlayers() {
+      const list = document.getElementById('player-list');
+      document.getElementById('player-count').textContent = `(${players.length})`;
+      if (!players.length) {
+        list.innerHTML = '<div class="empty-state">No players yet. Add some to get started.</div>';
+        return;
+      }
+      list.innerHTML = players.map(p => `
+        <div class="player-item" data-id="${p.id}">
+          <div class="player-info">
+            <div class="player-name">${escapeHtml(p.name)}</div>
+            <div class="player-meta">
+              <span class="badge badge-level">Lvl ${p.level}</span>
+              ${genderBadge(p.gender)}
+              <span>🕒 ${p.start} – ${p.end}</span>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn-danger" onclick="removePlayer('${p.id}')">Remove</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    document.getElementById('player-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('p-name').value.trim();
+      const level = parseFloat(document.getElementById('p-level').value);
+      const gender = document.getElementById('p-gender').value;
+      const start = document.getElementById('p-start').value;
+      const end = document.getElementById('p-end').value;
+
+      if (timeToMinutes(end) <= timeToMinutes(start)) {
+        toast('End time must be after start time');
+        return;
+      }
+
+      players.push({ id: uid(), name, level, gender, start, end });
+      save();
+      renderPlayers();
+      document.getElementById('player-form').reset();
+      document.getElementById('p-level').value = '3.0';
+      document.getElementById('p-start').value = '09:00';
+      document.getElementById('p-end').value = '13:00';
+      toast('Player added');
+    });
+
+    window.removePlayer = function(id) {
+      players = players.filter(p => p.id !== id);
+      customMatches = customMatches.filter(m => !m.playerIds.includes(id));
+      customSelectedIds = customSelectedIds.filter(x => x !== id);
+      save();
+      renderPlayers();
+      renderCustomList();
+      toast('Player removed');
+    };
+
+    document.getElementById('btn-clear-players').addEventListener('click', () => {
+      if (!confirm('Clear all players and custom matches?')) return;
+      players = [];
+      customMatches = [];
+      customSelectedIds = [];
+      save();
+      renderPlayers();
+      renderCustomList();
+      toast('Cleared');
+    });
+
+    document.getElementById('btn-load-sample').addEventListener('click', () => {
+      const samples = [
+        { name: 'Carlos M.', level: 4.5, gender: 'M', start: '09:00', end: '13:00' },
+        { name: 'Sofia R.', level: 4.0, gender: 'F', start: '09:00', end: '12:00' },
+        { name: 'Diego L.', level: 3.5, gender: 'M', start: '09:30', end: '13:00' },
+        { name: 'Elena V.', level: 3.5, gender: 'F', start: '09:00', end: '13:00' },
+        { name: 'Marco T.', level: 5.0, gender: 'M', start: '10:00', end: '13:00' },
+        { name: 'Lucia P.', level: 4.5, gender: 'F', start: '09:00', end: '12:30' },
+        { name: 'Javier H.', level: 2.5, gender: 'M', start: '09:00', end: '12:00' },
+        { name: 'Ana G.', level: 2.5, gender: 'F', start: '09:00', end: '13:00' },
+        { name: 'Pablo S.', level: 3.0, gender: 'M', start: '10:00', end: '13:00' },
+        { name: 'Maria F.', level: 3.0, gender: 'F', start: '09:30', end: '12:30' },
+        { name: 'Luis N.', level: 5.5, gender: 'M', start: '09:00', end: '11:30' },
+        { name: 'Carmen B.', level: 4.0, gender: 'F', start: '10:00', end: '13:00' },
+      ];
+      samples.forEach(s => players.push({ ...s, id: uid() }));
+      save();
+      renderPlayers();
+      toast('Sample players loaded');
+    });
+
+    // ========== CUSTOM MATCHES ==========
+    function refreshCustomSelect() {
+      const sel = document.getElementById('custom-player-select');
+      const available = players.filter(p => !customSelectedIds.includes(p.id));
+      sel.innerHTML = '<option value="">— Choose player —</option>' +
+        available.map(p => `<option value="${p.id}">${escapeHtml(p.name)} (Lvl ${p.level})</option>`).join('');
+    }
+
+    function renderCustomSelected() {
+      const box = document.getElementById('custom-selected');
+      box.innerHTML = customSelectedIds.map(id => {
+        const p = players.find(x => x.id === id);
+        if (!p) return '';
+        return `<span class="chip">${escapeHtml(p.name)} <button type="button" onclick="removeCustomSelected('${id}')">&times;</button></span>`;
+      }).join('');
+      document.getElementById('btn-add-custom').disabled = customSelectedIds.length !== 4;
+      refreshCustomSelect();
+    }
+
+    window.removeCustomSelected = function(id) {
+      customSelectedIds = customSelectedIds.filter(x => x !== id);
+      renderCustomSelected();
+    };
+
+    document.getElementById('custom-player-select').addEventListener('change', function() {
+      const id = this.value;
+      if (!id || customSelectedIds.includes(id) || customSelectedIds.length >= 4) return;
+      customSelectedIds.push(id);
+      this.value = '';
+      renderCustomSelected();
+    });
+
+    document.getElementById('btn-add-custom').addEventListener('click', () => {
+      if (customSelectedIds.length !== 4) return;
+      const preferred = document.getElementById('custom-preferred-time').value || null;
+      customMatches.push({
+        id: uid(),
+        playerIds: [...customSelectedIds],
+        preferredTime: preferred
+      });
+      customSelectedIds = [];
+      document.getElementById('custom-preferred-time').value = '';
+      save();
+      renderCustomSelected();
+      renderCustomList();
+      toast('Custom match added');
+    });
+
+    function renderCustomList() {
+      const list = document.getElementById('custom-list');
+      if (!customMatches.length) {
+        list.innerHTML = '<div class="empty-state">No custom matches defined.</div>';
+        return;
+      }
+      list.innerHTML = customMatches.map(m => {
+        const names = m.playerIds.map(id => {
+          const p = players.find(x => x.id === id);
+          return p ? escapeHtml(p.name) : '?';
+        });
+        return `
+          <div class="player-item">
+            <div class="player-info">
+              <div class="player-name">${names[0]} & ${names[1]}  vs  ${names[2]} & ${names[3]}</div>
+              <div class="player-meta">
+                ${m.preferredTime ? 'Preferred: ' + m.preferredTime : 'Any time'}
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn-danger" onclick="removeCustom('${m.id}')">Remove</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.removeCustom = function(id) {
+      customMatches = customMatches.filter(m => m.id !== id);
+      save();
+      renderCustomList();
+      toast('Custom match removed');
+    };
+
+    // ========== SCHEDULE GENERATION ==========
+    function getSettings() {
+      return {
+        courts: parseInt(document.getElementById('num-courts').value) || 2,
+        duration: parseInt(document.getElementById('match-duration').value) || 60,
+        sessionStart: document.getElementById('session-start').value,
+        sessionEnd: document.getElementById('session-end').value,
+        changeover: parseInt(document.getElementById('changeover').value) || 0,
+        maxMatches: parseInt(document.getElementById('max-matches').value) || 3,
+        genderPref: document.querySelector('input[name="gender-pref"]:checked').value,
+        levelTol: parseFloat(document.getElementById('level-tolerance').value) || 1.5
+      };
+    }
+
+    function isAvailable(player, slotStart, slotEnd) {
+      const pStart = timeToMinutes(player.start);
+      const pEnd = timeToMinutes(player.end);
+      return pStart <= slotStart && pEnd >= slotEnd;
+    }
+
+    function levelSpread(group) {
+      const levels = group.map(p => p.level);
+      return Math.max(...levels) - Math.min(...levels);
+    }
+
+    function genderScore(group, pref) {
+      const genders = group.map(p => p.gender);
+      const m = genders.filter(g => g === 'M').length;
+      const f = genders.filter(g => g === 'F').length;
+      if (pref === 'same') {
+        // Prefer all same or at least 3 of one
+        if (m === 4 || f === 4) return 2;
+        if (m === 3 || f === 3) return 1;
+        return 0;
+      }
+      if (pref === 'mixed') {
+        // Prefer 2-2
+        if (m === 2 && f === 2) return 2;
+        if (m >= 1 && f >= 1) return 1;
+        return 0;
+      }
+      return 1; // any
+    }
+
+    function findBestQuartet(available, usedInSlot, matchCounts, settings, excludeIds = new Set()) {
+      const candidates = available.filter(p =>
+        !usedInSlot.has(p.id) &&
+        !excludeIds.has(p.id) &&
+        (matchCounts[p.id] || 0) < settings.maxMatches
+      );
+      if (candidates.length < 4) return null;
+
+      // Sort by level
+      candidates.sort((a, b) => a.level - b.level);
+
+      let best = null;
+      let bestScore = -Infinity;
+
+      // Try sliding windows and some random combinations for variety
+      for (let i = 0; i <= candidates.length - 4; i++) {
+        // Take consecutive by level (good for balance)
+        const group = candidates.slice(i, i + 4);
+        const spread = levelSpread(group);
+        if (spread > settings.levelTol + 0.5) continue; // soft skip
+
+        const gScore = genderScore(group, settings.genderPref);
+        // Prefer lower total matches already played
+        const playScore = 4 - group.reduce((s, p) => s + (matchCounts[p.id] || 0), 0) / settings.maxMatches;
+        const score = (settings.levelTol - spread) * 2 + gScore * 1.5 + playScore;
+
+        if (score > bestScore) {
+          bestScore = score;
+          best = group;
+        }
+      }
+
+      // Also try a few more combinations if we have more players
+      if (candidates.length > 6) {
+        for (let attempt = 0; attempt < 12; attempt++) {
+          const shuffled = [...candidates].sort(() => Math.random() - 0.5).slice(0, 4);
+          const spread = levelSpread(shuffled);
+          if (spread > settings.levelTol + 1) continue;
+          const gScore = genderScore(shuffled, settings.genderPref);
+          const playScore = 4 - shuffled.reduce((s, p) => s + (matchCounts[p.id] || 0), 0) / settings.maxMatches;
+          const score = (settings.levelTol - spread) * 2 + gScore * 1.5 + playScore;
+          if (score > bestScore) {
+            bestScore = score;
+            best = shuffled;
+          }
+        }
+      }
+
+      return best;
+    }
+
+    function generateSchedule() {
+      const settings = getSettings();
+      const startMin = timeToMinutes(settings.sessionStart);
+      const endMin = timeToMinutes(settings.sessionEnd);
+      const slotLen = settings.duration + settings.changeover;
+
+      if (endMin <= startMin) {
+        toast('Session end must be after start');
+        return;
+      }
+      if (players.length < 4) {
+        toast('Need at least 4 players');
+        return;
+      }
+
+      const slots = [];
+      for (let t = startMin; t + settings.duration <= endMin; t += slotLen) {
+        slots.push({ start: t, end: t + settings.duration });
+      }
+
+      if (!slots.length) {
+        toast('No time slots fit in the session window');
+        return;
+      }
+
+      const matchCounts = {};
+      players.forEach(p => matchCounts[p.id] = 0);
+      const schedule = [];
+      const remainingCustom = [...customMatches];
+
+      for (const slot of slots) {
+        const usedInSlot = new Set();
+        const courts = [];
+        const available = players.filter(p => isAvailable(p, slot.start, slot.end));
+
+        // 1. Try to place custom matches first
+        for (let i = remainingCustom.length - 1; i >= 0 && courts.length < settings.courts; i--) {
+          const cm = remainingCustom[i];
+          const group = cm.playerIds.map(id => players.find(p => p.id === id)).filter(Boolean);
+          if (group.length !== 4) continue;
+          if (group.some(p => usedInSlot.has(p.id))) continue;
+          if (group.some(p => !isAvailable(p, slot.start, slot.end))) continue;
+          if (group.some(p => (matchCounts[p.id] || 0) >= settings.maxMatches)) continue;
+          if (cm.preferredTime) {
+            const pref = timeToMinutes(cm.preferredTime);
+            // Only place if this slot is reasonably close (±30 min) or no preferred left
+            if (Math.abs(slot.start - pref) > 45) continue;
+          }
+
+          // Assign teams: first two vs last two (as defined)
+          courts.push({
+            court: courts.length + 1,
+            teamA: [group[0], group[1]],
+            teamB: [group[2], group[3]],
+            isCustom: true,
+            spread: levelSpread(group)
+          });
+          group.forEach(p => {
+            usedInSlot.add(p.id);
+            matchCounts[p.id] = (matchCounts[p.id] || 0) + 1;
+          });
+          remainingCustom.splice(i, 1);
+        }
+
+        // 2. Fill remaining courts with auto matches
+        while (courts.length < settings.courts) {
+          const quartet = findBestQuartet(available, usedInSlot, matchCounts, settings);
+          if (!quartet) break;
+
+          // Pair them: sort by level and do 1+4 vs 2+3 for balance, or simple split
+          const sorted = [...quartet].sort((a, b) => a.level - b.level);
+          // Better balance: strongest with weakest
+          const teamA = [sorted[0], sorted[3]];
+          const teamB = [sorted[1], sorted[2]];
+
+          courts.push({
+            court: courts.length + 1,
+            teamA,
+            teamB,
+            isCustom: false,
+            spread: levelSpread(quartet)
+          });
+          quartet.forEach(p => {
+            usedInSlot.add(p.id);
+            matchCounts[p.id] = (matchCounts[p.id] || 0) + 1;
+          });
+        }
+
+        const idle = available.filter(p => !usedInSlot.has(p.id));
+        schedule.push({
+          start: slot.start,
+          end: slot.end,
+          courts,
+          idle
+        });
+      }
+
+      lastSchedule = { schedule, settings, matchCounts };
+      renderSchedule();
+      toast('Schedule generated');
+    }
+
+    function renderSchedule() {
+      const out = document.getElementById('schedule-output');
+      const stats = document.getElementById('stats-bar');
+
+      if (!lastSchedule || !lastSchedule.schedule.length) {
+        out.innerHTML = '<div class="empty-state">No schedule to show.</div>';
+        stats.style.display = 'none';
+        return;
+      }
+
+      const { schedule, matchCounts } = lastSchedule;
+      let totalMatches = 0;
+      let spreads = [];
+      const playersUsed = new Set();
+
+      schedule.forEach(slot => {
+        slot.courts.forEach(c => {
+          totalMatches++;
+          spreads.push(c.spread);
+          [...c.teamA, ...c.teamB].forEach(p => playersUsed.add(p.id));
+        });
+      });
+
+      document.getElementById('stat-matches').textContent = totalMatches;
+      document.getElementById('stat-players').textContent = playersUsed.size;
+      document.getElementById('stat-slots').textContent = schedule.length;
+      document.getElementById('stat-spread').textContent = spreads.length
+        ? (spreads.reduce((a, b) => a + b, 0) / spreads.length).toFixed(2)
+        : '—';
+      stats.style.display = 'flex';
+
+      out.innerHTML = schedule.map(slot => {
+        if (!slot.courts.length && !slot.idle.length) return '';
+        const timeLabel = `${minutesToTime(slot.start)} – ${minutesToTime(slot.end)}`;
+        const courtsHtml = slot.courts.map(c => {
+          const teamHtml = (team) => team.map(p => `
+            <div class="team-player">${escapeHtml(p.name)}</div>
+            <div class="team-level">Lvl ${p.level} ${p.gender}</div>
+          `).join('');
+          return `
+            <div class="court-card">
+              <div class="court-title">Court ${c.court}${c.isCustom ? ' · Custom' : ''}</div>
+              <div class="match-players">
+                <div class="team">${teamHtml(c.teamA)}</div>
+                <div class="vs">VS</div>
+                <div class="team">${teamHtml(c.teamB)}</div>
+              </div>
+              <div class="match-meta">Level spread: ${c.spread.toFixed(1)}</div>
+            </div>
+          `;
+        }).join('');
+
+        const idleHtml = slot.idle.length
+          ? `<div class="idle-players">Waiting / available: ${slot.idle.map(p => escapeHtml(p.name)).join(', ')}</div>`
+          : '';
+
+        return `
+          <div class="slot">
+            <div class="slot-time">🕐 ${timeLabel}</div>
+            <div class="courts">${courtsHtml || '<div class="empty-state" style="padding:8px">No matches this slot</div>'}</div>
+            ${idleHtml}
+          </div>
+        `;
+      }).join('') || '<div class="empty-state">Could not form any matches with current constraints.</div>';
+    }
+
+    document.getElementById('btn-generate').addEventListener('click', generateSchedule);
+
+    document.getElementById('btn-export').addEventListener('click', () => {
+      if (!lastSchedule) { toast('Generate a schedule first'); return; }
+      let text = 'PADEL DOUBLES SCHEDULE\n';
+      text += `Generated: ${new Date().toLocaleString()}\n`;
+      text += `Courts: ${lastSchedule.settings.courts} | Duration: ${lastSchedule.settings.duration} min\n\n`;
+
+      lastSchedule.schedule.forEach(slot => {
+        text += `=== ${minutesToTime(slot.start)} – ${minutesToTime(slot.end)} ===\n`;
+        slot.courts.forEach(c => {
+          const a = c.teamA.map(p => `${p.name} (${p.level})`).join(' & ');
+          const b = c.teamB.map(p => `${p.name} (${p.level})`).join(' & ');
+          text += `Court ${c.court}${c.isCustom ? ' [Custom]' : ''}: ${a}  vs  ${b}\n`;
+        });
+        if (slot.idle.length) {
+          text += `Waiting: ${slot.idle.map(p => p.name).join(', ')}\n`;
+        }
+        text += '\n';
+      });
+
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'padel-schedule.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('Exported');
+    });
+
+    document.getElementById('btn-print').addEventListener('click', () => {
+      window.print();
+    });
+
+    // ========== INIT ==========
+    renderPlayers();
+    renderCustomList();
+  </script>
+</body>
+</html>
